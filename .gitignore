@@ -1,0 +1,7 @@
+# Ignored file extensions
+*.bak
+
+
+# Ignored directories
+work/
+db/
