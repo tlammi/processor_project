@@ -1,2 +1,2 @@
-Project: 8-bit processor
+Project: 4-bit processor
 
