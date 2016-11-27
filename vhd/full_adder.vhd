@@ -2,7 +2,7 @@
 -- Project: processor
 -- Author:  Toni Lammi
 -- Date:    2016-11-06
--- File:    alu.vhd
+-- File:    full_adder.vhd
 -- Design:  Full adder
 ----------------------------------------------------
 -- Description: One bit full adder logic.

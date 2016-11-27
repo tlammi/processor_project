@@ -2,7 +2,7 @@
 -- Project: processor
 -- Author:  Toni Lammi
 -- Date:    2016-11-06
--- File:    alu.vhd
+-- File:    mux_2to1.vhd
 -- Design:  2 to 1 multiplexer
 ----------------------------------------------------
 -- Description: Multiplexer logic with custom bit width

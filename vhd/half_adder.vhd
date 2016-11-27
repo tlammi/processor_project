@@ -2,7 +2,7 @@
 -- Project: processor
 -- Author:  Toni Lammi
 -- Date:    2016-11-06
--- File:    alu.vhd
+-- File:    half_adder.vhd
 -- Design:  Half adder
 ----------------------------------------------------
 -- Description: One bit half adder logic.

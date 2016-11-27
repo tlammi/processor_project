@@ -2,7 +2,7 @@
 -- Project: processor
 -- Author:  Toni Lammi
 -- Date:    2016-11-06
--- File:    alu.vhd
+-- File:    full_adder_tb.vhd
 -- Design:  Full adder testbench
 ----------------------------------------------------
 -- Description: One bit full adder logic testbench
@@ -20,18 +20,6 @@ use ieee.std_logic_1164.all;
 entity full_adder_tb is
 begin
 end full_adder_tb;
-
---procedure check_failure (a_in : in std_logic;
---                        b_in : in std_logic;
---                        c_in : in std_logic;
---                        c_out : in std_logic;
---                        s_out : in std_logic) is
---begin
---    assert s_out = ((a_in xor b_in) xor c_in) report "Failure" severity failure;
---    assert c_out = (a_in and b_in) or (c_in and a_in) or (c_in and b_in)
---        report "Failure" severity failure;
---end check_failure;
-
 
 architecture behaviorial of full_adder_tb is
 
