@@ -32,23 +32,27 @@ architecture testbench of multiplier_tb is
     signal clk      : std_logic := '0';
     signal rst_n    : std_logic := '0';
     
-    signal input1   : std_logic_vector(bit_width_c-1    downto 0);
-    signal input2   : std_logic_vector(bit_width_c-1    downto 0);
-    signal duv_out   : std_logic_vector(bit_width_c*2-1  downto 0);
+    signal input_a1   : std_logic_vector(bit_width_c-1    downto 0);
+    signal input_b1   : std_logic_vector(bit_width_c-1    downto 0);
+    
+    signal input_a2   : std_logic_vector(bit_width_c-1    downto 0);
+    signal input_b2   : std_logic_vector(bit_width_c-1    downto 0);
+    signal duv1_out   : std_logic_vector(bit_width_c*2-1  downto 0);
+    signal duv2_out   : std_logic_vector(bit_width_c*2-1  downto 0);
+    
     
     -- DUV
     component multiplier is
-        generic(input_bit_width_g: integer);
+        generic(
+            input_bit_width_g: integer;
+            signed_mode_g: boolean
+        );
         port(
             a_in : in std_logic_vector(input_bit_width_g-1 downto 0);
             b_in : in std_logic_vector(input_bit_width_g-1 downto 0);
             result_out : out std_logic_vector(input_bit_width_g*2-1 downto 0)
         );
     end component;
-    
-    -- File interfaces
-    file input_f    : text open read_mode is "multiplier_input.txt";
-    file ref_f      : text open read_mode is "multiplier_ref.txt";
     
 begin
     
@@ -59,88 +63,68 @@ begin
     
     
     -- Design Under Verification
-    duv : multiplier
-        generic map(input_bit_width_g => bit_width_c)
+    duv1 : multiplier
+        generic map(
+            input_bit_width_g => bit_width_c,
+            signed_mode_g => true
+        )
         port map(
-            a_in => input1,
-            b_in => input2,
-            result_out => duv_out
+            a_in => input_a1,
+            b_in => input_b1,
+            result_out => duv1_out
         );
-    
-    -- Synchronous process for reading inputs and feeding them to DUV's inputs
+    duv2 : multiplier
+        generic map(
+            input_bit_width_g => bit_width_c,
+            signed_mode_g => false
+        )
+        port map(
+            a_in => input_a2,
+            b_in => input_b2,
+            result_out => duv2_out
+        );
+    -- Synchronous process for feeding inputs to DUVs' inputs
     input_proc : process(clk, rst_n)
-            -- Input line variable
-            variable inline_var : line;
-            -- Variable that holds the first input
-            variable input1_var : integer;
-            -- Variable that holds the second input
-            variable input2_var : integer;
-            -- Variable that tells if the read characters
-            -- represent a number
-            variable is_num_var : boolean;
-        begin
-        -- Reset functionality
+        variable input_a_var : integer := 0;
+        variable input_b_var : integer := 0;
+    begin
         if rst_n = '0' then
-            input1 <= (others => '0');
-            input2 <= (others => '0');
-        -- Rising clock edge
-        elsif clk'EVENT and clk = '1' then
-            is_num_var := false;
-            -- Read lines until the first data line or EOF is found
-            while not endfile(input_f) and not is_num_var loop
-                readline(input_f, inline_var);
-                read(inline_var, input1_var, is_num_var);
-            end loop;
-
-            -- Foud a data line
-            if is_num_var then
-                read(inline_var, input2_var, is_num_var);
-                -- Invalid line in input file
-                if not is_num_var then
-                    assert false report "Invalid line in input file " severity failure;
-                else
-                    -- Set the read data as DUV input------------------------------------------------------------------
-                    input1 <= std_logic_vector(to_signed(input1_var, bit_width_c));
-                    input2 <= std_logic_vector(to_signed(input2_var, bit_width_c));
-                end if;
-            -- EOF
+            input_a1 <= (others => '0');
+            input_b1 <= (others => '0');
+            input_a2 <= (others => '0');
+            input_b2 <= (others => '0');
+            
+        elsif clk'event and clk = '1' then
+            input_a1 <= std_logic_vector(to_unsigned(input_a_var, bit_width_c));
+            input_b1 <= std_logic_vector(to_unsigned(input_b_var, bit_width_c));
+            input_a2 <= std_logic_vector(to_unsigned(input_a_var, bit_width_c));
+            input_b2 <= std_logic_vector(to_unsigned(input_b_var, bit_width_c));
+            
+            -- Going through all variable b's values
+            if input_b_var < 15 then
+                input_b_var := input_b_var + 1;
+            -- If b is at its max, reset b and increment a
+            elsif input_a_var < 15 then
+                input_a_var := input_a_var + 1;
+                input_b_var := 0;
+            -- both variables at max -> simulation passed
             else
-                report "Reached end of input file ";
+                assert false report "Simulation success." severity failure;
             end if;
-        else
-            -- nop
         end if;
     end process;
     
-    -- Synchronous process for reading DUV's outputs and comparing them with reference outputs.
-    checker_proc : process(clk)
-        -- Value gained from DUV output
-        variable output_var : integer;
-        -- Line variable from reference file
-        variable inline_var : line;
-        -- Integer value from reference file
-        variable reference_var : integer;
-        -- Variable to check validity of reference values.
-        variable is_num_var : boolean;
+    -- Synchronous process for reading and checking DUVs' outputs
+    checker_proc : process(clk, rst_n)
     begin
-        if rst_n = '1' and clk'EVENT and clk = '1' then
-            is_num_var := false;
-            while not endfile(ref_f) and not is_num_var loop
-                readline(ref_f, inline_var);
-                read(inline_var, reference_var, is_num_var);
-            end loop;
-            
-            -- Valid reference value
-            if is_num_var then
-                output_var := to_integer(signed(duv_out));
-                assert output_var = reference_var report "Output and reference values don't match: "& integer'image(output_var)
-                        & "/=" & integer'image(reference_var) severity failure;
-            -- End of reference file found <=> simultion successful
-            else
-                assert false report "Simulation successful." severity failure;
-            end if;
-        else
+        if rst_n = '0' then
             -- nop
+        elsif clk'event and clk = '1' then
+            assert to_integer(signed(input_a1)) * to_integer(signed(input_b1)) = to_integer(signed(duv1_out))
+                report "Signed multiplier's inputs and outputs dont match" severity failure;
+            assert to_integer(unsigned(input_a2)) * to_integer(unsigned(input_b2)) = to_integer(unsigned(duv2_out))
+                report "Unsigned multiplier's inputs and outputs dont match" severity failure;
+            
         end if;
     end process;
 end testbench;

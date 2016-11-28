@@ -61,7 +61,7 @@ begin
             );
     end generate gen_adders;
     
-    -- MSB carry out to overflow indicator output
-    overflow_out <= carry(bit_width);
+    -- MSB carry out xorred with MSB-1 to indicate overflow
+    overflow_out <= carry(bit_width) xor carry(bit_width-1);
     
 end functionality;

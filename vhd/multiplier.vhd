@@ -12,6 +12,7 @@
 --  Author      |   Date        |   Info
 --  Toni Lammi  |   2016-11-22  | Initial structure
 --  Toni Lammi  |   2016-11-27  | Fixed syntax and compiled the design
+--  Toni Lammi  |   2016-11-28  | Added functionality for unsigned multiplication operations
 ----------------------------------------------------
 
 library ieee;
@@ -20,8 +21,8 @@ use ieee.numeric_std.all;
 
 entity multiplier is
     generic(
-        input_bit_width_g   : integer;          -- Number of bits in input busses
-        signed_mode         : boolean := true   -- Is signed mode used in the component
+        input_bit_width_g       : integer;  -- Number of bits in input busses
+        signed_mode_g         : boolean     -- Is signed mode used in the component
     );
     port(
         a_in        : in  std_logic_vector(input_bit_width_g-1 downto 0);
@@ -37,7 +38,7 @@ begin
         variable input_var2 : integer;
         variable output_var : integer;
     begin
-        if signed_mode then
+        if signed_mode_g then
             input_var1 := to_integer(signed(a_in));
             input_var2 := to_integer(signed(b_in));
         else
