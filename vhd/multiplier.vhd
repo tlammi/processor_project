@@ -20,12 +20,13 @@ use ieee.numeric_std.all;
 
 entity multiplier is
     generic(
-        input_bit_width : integer
+        input_bit_width_g   : integer;          -- Number of bits in input busses
+        signed_mode         : boolean := true   -- Is signed mode used in the component
     );
     port(
-        a_in        : in  std_logic_vector(input_bit_width-1 downto 0);
-        b_in        : in  std_logic_vector(input_bit_width-1 downto 0);
-        result_out  : out std_logic_vector((input_bit_width)*2-1 downto 0)
+        a_in        : in  std_logic_vector(input_bit_width_g-1 downto 0);
+        b_in        : in  std_logic_vector(input_bit_width_g-1 downto 0);
+        result_out  : out std_logic_vector((input_bit_width_g)*2-1 downto 0)
     );
 end multiplier;
 
@@ -36,9 +37,14 @@ begin
         variable input_var2 : integer;
         variable output_var : integer;
     begin
-        input_var1 := to_integer(signed(a_in));
-        input_var2 := to_integer(signed(b_in));
+        if signed_mode then
+            input_var1 := to_integer(signed(a_in));
+            input_var2 := to_integer(signed(b_in));
+        else
+            input_var1 := to_integer(unsigned(a_in));
+            input_var2 := to_integer(unsigned(b_in));
+        end if;
         output_var := input_var1 * input_var2;
-        result_out <= std_logic_vector(to_signed(output_var, input_bit_width*2));
+        result_out <= std_logic_vector(to_signed(output_var, input_bit_width_g*2));
     end process;
 end functional;
