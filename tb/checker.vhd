@@ -5,9 +5,10 @@
 -- File:    checker.vhd
 -- Design:  Checker
 ----------------------------------------------------
--- Description: Block used by test benches to refer
---              the DUV's outputs to values in
---              reference files.
+-- Description:
+-- Block used by test benches to refer the DUV's outputs to values in reference files.
+-- Stops the simulation with assert once all of the references have been compared with block inputs
+-- 
 ----------------------------------------------------
 -- $Log$
 --  Author      |   Date        |   Info
@@ -22,11 +23,9 @@ ieee.numeric_std.all;
 entity checker is
 begin
     generic(
-        -- Path to reference file
-        ref_file_path_g : string;
-        -- Path to log file.
-        output_file_path_g : string;
-        input_bus_width_g : integer;
+        ref_file_path_g     : string    := "reference.txt"; -- Path to reference file
+        output_file_path_g  : string    := "output.txt";    -- Path to log file.
+        input_bus_width_g   : integer                       -- Input bus width (from DUV)
     );
     port(
         -- Clock signal for synchronizing with inputs
@@ -73,9 +72,9 @@ begin
                 else
                     correct_out <= '0';
                 end if;
-            -- End of File <=> simulation passed
+            -- End of File <=> simulation end
             else
-                assert false report "Simulation successful" severity failure;
+                assert false report "Simulation ended" severity failure;
             end if;
         else
             -- nop
