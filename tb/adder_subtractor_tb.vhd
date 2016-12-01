@@ -42,7 +42,7 @@ architecture functionality of adder_subtractor is
     signal carry        : std_logic_vector(bit_width downto 0);
 begin
     -- Xor results
-    for I in 0 to bit_width-1 loop
+    for I in 0 to bit_width-1 generate
         xor_result(I) <= b_in(I) xor mode_in;
     end loop;
     

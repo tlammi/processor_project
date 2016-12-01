@@ -17,13 +17,13 @@ use ieee.std_logic_1164.all;
 
 entity adder_subtractor is
     generic(
-        bit_width: integer
+        bit_width_g: integer
     );
     port(
-        a_in        : in  std_logic_vector(bit_width-1 downto 0);
-        b_in        : in  std_logic_vector(bit_width-1 downto 0);
+        a_in        : in  std_logic_vector(bit_width_g-1 downto 0);
+        b_in        : in  std_logic_vector(bit_width_g-1 downto 0);
         mode_in     : in  std_logic;
-        result_out  : out std_logic_vector(bit_width-1 downto 0);
+        result_out  : out std_logic_vector(bit_width_g-1 downto 0);
         overflow_out: out std_logic
     );
     
@@ -38,30 +38,32 @@ architecture functionality of adder_subtractor is
         );
     end component;
     
-    signal xor_result   : std_logic_vector(bit_width-1 downto 0);
-    signal carry        : std_logic_vector(bit_width downto 0);
+    signal xor_result   : std_logic_vector(bit_width_g-1 downto 0); -- Results of xors before full adders
+    signal carry        : std_logic_vector(bit_width_g downto 0); -- Carry nets between full adders
+    signal output_buffer: std_logic_vector(bit_width_g-1 downto 0); -- Output buffer that connects full adder outputs to blocks output bus
 begin
     -- Xor results
-    for I in 0 to bit_width-1 loop
+    gen_xors : for I in 0 to bit_width_g-1 generate
         xor_result(I) <= b_in(I) xor mode_in;
-    end loop;
+        result_out(I) <= output_buffer(I);
+    end generate gen_xors;
     
     -- Mode to LSB carry in
     carry(0) <= mode_in;
     
     -- Full adders.
-    gen_adders for I in 0 to bit_width-1 generate
+    gen_adders : for I in 0 to bit_width_g-1 generate
         fax : full_adder -- Full Adder X
             port map(
                 a_in => a_in(I),
                 b_in => xor_result(I),
                 c_in => carry(I),
                 c_out => carry(I+1),
-                s_out => result_out(I)
+                s_out => output_buffer(I)
             );
     end generate gen_adders;
     
     -- MSB carry out xorred with MSB-1 to indicate overflow
-    overflow_out <= carry(bit_width) xor carry(bit_width-1);
+    overflow_out <= carry(bit_width_g) xor carry(bit_width_g-1);
     
 end functionality;
