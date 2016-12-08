@@ -158,6 +158,9 @@ begin
             data_out => complement_result
         );
     
+    before_components1 <= operand1_in;
+    before_components2 <= operand2_in;
+    
     -- Multiplexer after sub blocks
     -- that selects the wanted operation
     with operation_select_in select

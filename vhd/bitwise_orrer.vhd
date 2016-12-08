@@ -18,10 +18,10 @@ use ieee.std_logic_1164.all;
 entity bitwise_orrer is
     generic(byte_width_g : integer);
     port(
-        data1_in : in  std_logic_vector(byte_width_g downto 0);
-        data2_in : in  std_logic_vector(byte_width_g downto 0);
+        data1_in : in  std_logic_vector(byte_width_g-1 downto 0);
+        data2_in : in  std_logic_vector(byte_width_g-1 downto 0);
         
-        data_out : out std_logic_vector(byte_width_g downto 0)
+        data_out : out std_logic_vector(byte_width_g-1 downto 0)
     );
 end bitwise_orrer;
 

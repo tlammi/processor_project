@@ -18,9 +18,9 @@ use ieee.std_logic_1164.all;
 entity bitwise_complementer is
     generic(byte_width_g : integer);
     port(
-        data_in : in  std_logic_vector(byte_width_g downto 0);
+        data_in : in  std_logic_vector(byte_width_g-1 downto 0);
         
-        data_out : out std_logic_vector(byte_width_g downto 0)
+        data_out : out std_logic_vector(byte_width_g-1 downto 0)
     );
 end bitwise_complementer;
 
@@ -30,6 +30,6 @@ architecture rtl of bitwise_complementer is
 
 begin
     gen_anders : for I in 0 to byte_width_g - 1 generate
-        data_out(I) <= not data1_in(I);
+        data_out(I) <= not data_in(I);
     end generate gen_anders;
 end rtl;

@@ -18,19 +18,18 @@ use ieee.std_logic_1164.all;
 entity bitwise_ander is
     generic(byte_width_g : integer);
     port(
-        data1_in : in  std_logic_vector(byte_width_g downto 0);
-        data2_in : in  std_logic_vector(byte_width_g downto 0);
+        data1_in : in  std_logic_vector(byte_width_g-1 downto 0);
+        data2_in : in  std_logic_vector(byte_width_g-1 downto 0);
         
-        data_out : out std_logic_vector(byte_width_g downto 0)
+        data_out : out std_logic_vector(byte_width_g-1 downto 0)
     );
 end bitwise_ander;
 
 
 
 architecture rtl of bitwise_ander is
-
 begin
     gen_anders : for I in 0 to byte_width_g - 1 generate
-        data_out(I) <= data1_in(I) and data2_in(I);
+        data_out(I) <= (data1_in(I) and data2_in(I));
     end generate gen_anders;
 end rtl;
