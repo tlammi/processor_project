@@ -11,6 +11,7 @@
 -- $Log$
 --  Author      |   Date        |   Info
 --  Toni Lammi  |   2017-04-08  | Skeleton for the entity
+--  Toni Lammi  |   2017-05-30  | Finnished output check process
 ----------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
@@ -266,9 +267,7 @@ begin
                         severity failure;
                 -- Multiply inputs (signed) 
                 when 13 =>
-                    assert signed(result2_from_duv & result1_from_duv) =
-                        to_signed(input1_integer_sig, operand_width_c) *
-                        to_signed(input2_integer_sig, operand_width_c);
+                    assert signed(result2_from_duv & result1_from_duv) = signed(operand1_to_duv)*signed(operand2_to_duv)
                         report "Invalid output"
                         severity failure;
                 -- Invalid code
